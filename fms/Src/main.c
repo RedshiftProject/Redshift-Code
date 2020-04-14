@@ -20,12 +20,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "can.h"
+
 #include "fatfs.h"
-#include "i2c.h"
-#include "spi.h"
-#include "usart.h"
-#include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -39,13 +35,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define MPU_6050_ADD 0b1101000 << 1 //Since HAL needs 8-bit address
-#define MPU_6050_ACC_X_H 0x3B
-#define MPU_6050_ACC_X_L 0x3C
-#define MPU_6050_ACC_Z_H 0x3F
-#define MPU_6050_ACC_Z_L 0x40
-#define MPU_6050_ACC_CONF 0x1C
-#define MPU_6050_PWR_MGMT 0x6B
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
