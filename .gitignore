@@ -56,3 +56,9 @@ dkms.conf
 
 #Ignore build directory
 build/
+
+#Ignore KiCad backup files
+*.sch-bak
+
+#Ignore backup files
+*.bak
