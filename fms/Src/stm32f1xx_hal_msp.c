@@ -32,11 +32,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN Define */
-#ifdef DEBUG
-#define DEBUG 1
-#else 
-#define DEBUG 0
-#endif
+
 /* USER CODE END Define */
 
 /* Private macro -------------------------------------------------------------*/
@@ -78,8 +74,9 @@ void HAL_MspInit(void)
 
   /** DISABLE: JTAG-DP Disabled and SW-DP Disabled 
   */
-  if(!DEBUG)
-  __HAL_AFIO_REMAP_SWJ_DISABLE(); 
+  #ifndef DEBUG_NEED
+    __HAL_AFIO_REMAP_SWJ_DISABLE();
+  #endif
   /// TODO: Disable debugging when not needed anymore
   
 

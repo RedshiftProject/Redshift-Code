@@ -29,15 +29,6 @@ OPT = -Og
 # Build path
 BUILD_DIR = build
 
-#######################################
-# Debug build
-#######################################
-ifeq ($(DEBUG),y)
-	C_DEFS = -DDEBUG 
-	CFLAGS = -g -gdwarf-2
-	BUILD_DIR = debug
-endif
-
 ######################################
 # source
 ######################################
@@ -170,6 +161,15 @@ LDSCRIPT = STM32F103C8Tx_FLASH.ld
 LIBS = -lc -lm -lnosys 
 LIBDIR = 
 LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
+
+#######################################
+# Debug build
+#######################################
+ifeq ($(DEBUG),y)
+    C_DEFS += -DDEBUG_NEED
+    CFLAGS += -g -gdwarf-2 -DDEBUG_NEED
+    BUILD_DIR = debug
+endif
 
 # default action: build all
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
