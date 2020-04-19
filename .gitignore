@@ -54,8 +54,9 @@ dkms.conf
 #STM32CUBEMX project generation files
 .mxproject
 
-#Ignore build directory
+#Ignore build/debug directory
 build/
+debug/
 
 #Kicad backup files
 *.bak
@@ -63,3 +64,6 @@ build/
 *.kicad_pcb-bak
 *.sch-bak
 _saved_*
+
+#Dunno but is in build folders
+*.lst

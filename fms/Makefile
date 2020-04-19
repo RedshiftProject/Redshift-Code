@@ -19,17 +19,24 @@ TARGET = stm32cube_generation
 ######################################
 # building variables
 ######################################
-# debug build?
-DEBUG = 1
+
 # optimization
 OPT = -Og
-
 
 #######################################
 # paths
 #######################################
 # Build path
 BUILD_DIR = build
+
+#######################################
+# Debug build
+#######################################
+ifeq ($(DEBUG),y)
+	C_DEFS = -DDEBUG 
+	CFLAGS = -g -gdwarf-2
+	BUILD_DIR = debug
+endif
 
 ######################################
 # source
@@ -119,10 +126,10 @@ C_DEFS =  \
 -DUSE_HAL_DRIVER \
 -DSTM32F103xB
 
-# If it is a debug version, enable SWD pins
-ifeq (${DEBUG}, 1)
-  C_DEFS += -DDEBUG
-endif
+# If it is a debug version, enable SWD pins by defining DEBUG
+# ifeq (${DEBUG}, 1)
+#   C_DEFS += -DDEBUG
+# endif
 
 
 # AS includes
@@ -144,9 +151,9 @@ ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffuncti
 
 CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
 
-ifeq ($(DEBUG), 1)
-CFLAGS += -g -gdwarf-2
-endif
+# ifeq ($(DEBUG), 1)
+# CFLAGS += -g -gdwarf-2
+# endif
 
 
 # Generate dependency information
@@ -202,7 +209,7 @@ $(BUILD_DIR):
 #######################################
 clean:
 	-rm -fR $(BUILD_DIR)
-  
+
 #######################################
 # dependencies
 #######################################
