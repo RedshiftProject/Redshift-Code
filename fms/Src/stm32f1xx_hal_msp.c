@@ -32,7 +32,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN Define */
-
+ 
 /* USER CODE END Define */
 
 /* Private macro -------------------------------------------------------------*/
@@ -77,8 +77,6 @@ void HAL_MspInit(void)
   #ifndef DEBUG_NEED
     __HAL_AFIO_REMAP_SWJ_DISABLE();
   #endif
-  /// TODO: Disable debugging when not needed anymore
-  
 
   /* USER CODE BEGIN MspInit 1 */
 

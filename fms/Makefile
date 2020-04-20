@@ -66,7 +66,8 @@ Middlewares/Third_Party/FatFs/src/diskio.c \
 Middlewares/Third_Party/FatFs/src/ff.c \
 Middlewares/Third_Party/FatFs/src/ff_gen_drv.c \
 Middlewares/Third_Party/FatFs/src/option/syscall.c \
-Src/user_diskio.c  
+Src/user_diskio.c \
+Src/dma.c
 
 # ASM sources
 ASM_SOURCES =  \
@@ -209,7 +210,7 @@ $(BUILD_DIR):
 #######################################
 clean:
 	-rm -fR $(BUILD_DIR)
-
+  
 #######################################
 # dependencies
 #######################################

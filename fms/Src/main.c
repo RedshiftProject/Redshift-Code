@@ -21,6 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+#include "dma.h"
 #include "fatfs.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -35,7 +36,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -46,6 +46,11 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+const static nmeaPacket nmea_msg_patron;
+nmeaPacket nmea_msg;
+ubxPacket ubx_msg;
+uint8_t uart_raw[512];
+uint8_t good=0;
 
 /* USER CODE END PV */
 
@@ -58,6 +63,32 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+//UART RX Complete callback function
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  //HAL_UART_Transmit(&huart1,(uint8_t*)"RX callback\n",12,HAL_MAX_DELAY);
+  //If it's the UART port connected to the GPS
+  if(huart == &huart2)
+  {
+    if(uart_raw[0] == 0xB5)
+    {
+      UBX_parser(huart,uart_raw,&ubx_msg);
+      HAL_UART_Receive_IT(&huart2,uart_raw,1);
+    }else if(uart_raw[0] == '$')
+    {
+      //If end of frame has arrived (Frame ends with <LF> - 0x0A)
+      if(uart_raw[nmea_msg.counter] == 0x0A)
+      {
+        good = 1;
+        nmea_msg.counter++;
+      }else{ //Keep receiving until we get <LF>
+        ///TODO: La gestion de packet nmea
+        nmea_msg.counter++;
+        HAL_UART_Receive_IT(huart, &uart_raw[nmea_msg.counter], 1);    
+      }
+    }
+  }
+}
 /* USER CODE END 0 */
 
 /**
@@ -88,6 +119,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_I2C1_Init();
   MX_USART1_UART_Init();
   MX_SPI1_Init();
@@ -114,31 +146,34 @@ int main(void)
     //I2C Stuff
 
     //MPU6050 Stuff
-    uint8_t acc_z[2]={0,0};    
+    //uint8_t acc_z[2]={0,0};    
     //wakeup[0] Register address for power management of MPU6050
     //wakeup[1] Register value to apply @address wakeup[0] (Sleep->0)
-    uint8_t wakeup[2];
-    wakeup[0]=MPU_6050_PWR_MGMT;
-    wakeup[1]=0x00;
+    //uint8_t wakeup[2];
+    //wakeup[0]=MPU_6050_PWR_MGMT;
+    //wakeup[1]=0x00;
     //MPU6050 : Verify if ready
-    if(HAL_I2C_IsDeviceReady(&hi2c1,MPU_6050_ADD,2,HAL_MAX_DELAY) != HAL_OK)
+    //if(HAL_I2C_IsDeviceReady(&hi2c1,MPU_6050_ADD,2,HAL_MAX_DELAY) != HAL_OK)
       //If not ready send message through UART
-      HAL_UART_Transmit(&huart1,(uint8_t *)"Not Okay Ready",14,HAL_MAX_DELAY);
+      //HAL_UART_Transmit(&huart1,(uint8_t *)"Not Okay Ready",14,HAL_MAX_DELAY);
     //MPU6050 : Configure POWER_MGMT register to power it up
-    if(HAL_I2C_Master_Transmit(&hi2c1,MPU_6050_ADD,(uint8_t *)wakeup,2,HAL_MAX_DELAY) != HAL_OK)
+    //if(HAL_I2C_Master_Transmit(&hi2c1,MPU_6050_ADD,(uint8_t *)wakeup,2,HAL_MAX_DELAY) != HAL_OK)
       //If not okay send message through UART
-      HAL_UART_Transmit(&huart1,(uint8_t *)"Not Okay Power",14,HAL_MAX_DELAY);
+      //HAL_UART_Transmit(&huart1,(uint8_t *)"Not Okay Power",14,HAL_MAX_DELAY);
 
     //MPU 6050 Acceleromter config (2g precision)
     //config[0] Register address for accelerometer precision of MPU6050
     //config[1] Register value to apply @address config[0] (2g precision)
-    uint8_t config[2];
-    config[0]=MPU_6050_ACC_CONF;
-    config[1]=0x00;
+    //uint8_t config[2];
+    //config[0]=MPU_6050_ACC_CONF;
+    //config[1]=0x00;
     //Send config via i2c
-    if(HAL_I2C_Master_Transmit(&hi2c1,MPU_6050_ADD,(uint8_t *)config,2,HAL_MAX_DELAY) != HAL_OK)
+    //if(HAL_I2C_Master_Transmit(&hi2c1,MPU_6050_ADD,(uint8_t *)config,2,HAL_MAX_DELAY) != HAL_OK)
       //If config not okay send message through UART
-      HAL_UART_Transmit(&huart1,(uint8_t *)"Not Okay Conf",14,HAL_MAX_DELAY);
+      //HAL_UART_Transmit(&huart1,(uint8_t *)"Not Okay Conf",14,HAL_MAX_DELAY);
+    
+    //GPS STUFF
+    HAL_UART_Receive_IT(&huart2,&uart_raw[0],1);
     
   /* USER CODE END 2 */
 
@@ -150,6 +185,7 @@ int main(void)
     //GPIO stuff
     //Turn on PINC13 / Reset = ON because of pullup on board
     HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13,GPIO_PIN_RESET);
+    //HAL_Delay(500);
     //UART Stuff
     //HAL_UART_Transmit(&huart1,(unsigned char*)"Hello World ! Tx\n",17,100);
     //HAL_UART_Receive(&huart1,uartString,17,2000);
@@ -166,21 +202,37 @@ int main(void)
     //  HAL_UART_Transmit(&huart1,(uint8_t *)"Not Okay TX",11,HAL_MAX_DELAY);
     //else{
       //Read Z acceleration (2 bytes) register from MPU6050 and put it in acc_z
-      if(HAL_I2C_Mem_Read(&hi2c1,MPU_6050_ADD,MPU_6050_ACC_Z_H,I2C_MEMADD_SIZE_8BIT,acc_z,2,HAL_MAX_DELAY))
+      //if(HAL_I2C_Mem_Read(&hi2c1,MPU_6050_ADD,MPU_6050_ACC_Z_H,I2C_MEMADD_SIZE_8BIT,acc_z,2,HAL_MAX_DELAY))
       //if(HAL_I2C_Master_Receive(&hi2c1,MPU_6050_ADD,(uint8_t *)acc_z,2,HAL_MAX_DELAY) != HAL_OK)
         //If read fails, send message through UART
-        HAL_UART_Transmit(&huart1,(uint8_t *)"Not Okay RX",11,HAL_MAX_DELAY);
-      else{
+        //HAL_UART_Transmit(&huart1,(uint8_t *)"Not Okay RX",11,HAL_MAX_DELAY);
+      //else{
         //If it works send z acceleration value through UART
-        HAL_UART_Transmit(&huart1,(uint8_t *)"acc_z: ",7,HAL_MAX_DELAY);
-        HAL_UART_Transmit(&huart1,(uint8_t *)acc_z,2,HAL_MAX_DELAY);
-      }
+        //HAL_UART_Transmit(&huart1,(uint8_t *)"acc_z: ",7,HAL_MAX_DELAY);
+        //HAL_UART_Transmit(&huart1,(uint8_t *)acc_z,2,HAL_MAX_DELAY);
+      //}
     //}
     //Send a CR/LF to end line as a delimiter
-    HAL_UART_Transmit(&huart1,(uint8_t *)"\n",1,HAL_MAX_DELAY);
+    //HAL_UART_Transmit(&huart1,(uint8_t *)"\n",1,HAL_MAX_DELAY);
     //Turn off PINC13 / Set = OFF because of pullup on board
+    //HAL_UART_Transmit(&huart1,(uint8_t *)"Debug\n",6,HAL_MAX_DELAY);
+
+    //GPS stuff
+    if(good)
+    {
+      good=0;
+      #ifdef DEBUG_NEED
+      //Output to "debug" serial
+      HAL_UART_Transmit_DMA(&huart1,&uart_raw[0],nmea_msg.counter);
+      #endif
+      ///TODO: La gestion de packet nmea
+      NMEA_parser(uart_raw,&nmea_msg);
+      nmea_msg = nmea_msg_patron;
+      HAL_UART_Receive_IT(&huart2,&uart_raw[0],1);
+    }
+
     HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13,GPIO_PIN_SET);
-    
+    //HAL_Delay(500);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

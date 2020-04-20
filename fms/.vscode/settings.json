@@ -11,6 +11,7 @@
         "can.h": "c",
         "ff_gen_drv.h": "c",
         "ffconf.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "dma.h": "c"
     }
 }
