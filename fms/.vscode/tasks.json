@@ -31,13 +31,35 @@
 				"kind": "build",
 				"isDefault": true
 			},
-			"problemMatcher": []
+			"problemMatcher": [],
+			"options":{
+				"statusbar": {
+					"label": "Make 🐞"
+				}
+			}
 		},
 		{
 			"type": "shell",
 			"label": "Makefile",
 			"command": "make",
-			"group": "build"
+			"group": "build",
+			"options":{
+				"statusbar": {
+					"hide": true
+				}
+			}
+		},
+		{
+			"type": "shell",
+			"label": "Flash STM32 (Debug)",
+			"command": "openocd -f target/stm32f103c8.cfg -c \"program debug/stm32cube_generation.elf verify reset exit\"",
+			"group": "test",
+			"problemMatcher": [],
+			"options":{
+				"statusbar": {
+					"label": "Flash 🐞"
+				}
+			}
 		},
 		{
 			"type": "shell",
@@ -47,27 +69,35 @@
 				"kind": "build",
 				"isDefault": true
 			},
-			"problemMatcher": []
+			"problemMatcher": [],
+			"options":{
+				"statusbar": {
+					"label": "Clean 🐞"
+				}
+			}
 		},
 		{
 			"type": "shell",
 			"label": "Makefile clean",
 			"command": "make clean",
-			"group": "build"
+			"group": "build",
+			"options":{
+				"statusbar": {
+					"hide": true
+				}
+			}
 		},
 		{
 			"type": "shell",
 			"label": "Flash STM32",
 			"command": "openocd -f target/stm32f103c8.cfg -c \"program build/stm32cube_generation.elf verify reset exit\"",
 			"group": "build",
-			"problemMatcher": []
-		},
-		{
-			"type": "shell",
-			"label": "Flash STM32 (Debug)",
-			"command": "openocd -f target/stm32f103c8.cfg -c \"program debug/stm32cube_generation.elf verify reset exit\"",
-			"group": "test",
-			"problemMatcher": []
+			"problemMatcher": [],
+			"options":{
+				"statusbar": {
+					"hide": true
+				}
+			}
 		}
 	]
 }
