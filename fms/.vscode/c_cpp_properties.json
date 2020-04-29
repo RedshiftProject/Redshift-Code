@@ -1,39 +1,38 @@
 {
-    "configurations": [
-        {
-            "name": "Win32",
-            "includePath": [
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/Inc/**",
-                "${workspaceFolder}/Inc",
-                "${workspaceFolder}/Drivers/**",
-                "${workspaceFolder}/Middlewares/Third_Party/FatFs/src",
-                "${workspaceFolder}/Drivers/STM32F1xx_HAL_Driver/Inc",
-                "${workspaceFolder}/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy",
-                "${workspaceFolder}/Drivers/CMSIS/Device/ST/STM32F1xx/Include",
-                "${workspaceFolder}/Drivers/CMSIS/Include",
-                "${workspaceFolder}/Drivers/CMSIS/Include",
-                "${workspaceFolder}/Inc/"
-            ],
-            "defines": [
-                "_DEBUG",
-                "UNICODE",
-                "_UNICODE",
-                "USE_HAL_DRIVER",
-                "STM32F103xB",
-                "DEBUG=1"
-            ],
-            "compilerPath": "C:/Program Files (x86)/GNU Tools Arm Embedded/9 2019-q4-major/bin/arm-none-eabi-gcc.exe",
-            "cStandard": "c11",
-            "cppStandard": "c++17",
-            "intelliSenseMode": "clang-x64",
-            "compilerArgs": [
-                "-mcpu=cortex-m3",
-                "-lc",
-                "-lm",
-                "-lnosys"
-            ]
-        }
-    ],
-    "version": 4
+  "configurations": [
+      {
+          "name": "Win32",
+          "includePath": [
+              "${workspaceFolder}/**",
+              "${workspaceFolder}/Inc/**",
+              "${workspaceFolder}/Inc",
+              "${workspaceFolder}/Drivers/**",
+              "${workspaceFolder}/Middlewares/Third_Party/FatFs/src",
+              "${workspaceFolder}/Drivers/STM32F1xx_HAL_Driver/Inc",
+              "${workspaceFolder}/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy",
+              "${workspaceFolder}/Drivers/CMSIS/Device/ST/STM32F1xx/Include",
+              "${workspaceFolder}/Drivers/CMSIS/Include",
+              "${workspaceFolder}/Drivers/CMSIS/Include",
+              "${workspaceFolder}/Inc/"
+          ],
+          "defines": [
+              "_DEBUG",
+              "UNICODE",
+              "_UNICODE",
+              "USE_HAL_DRIVER",
+              "STM32F103xB"
+          ],
+          "compilerPath": "C:/Program Files (x86)/GNU Tools Arm Embedded/9 2019-q4-major/bin/arm-none-eabi-gcc.exe",
+          "cStandard": "c11",
+          "cppStandard": "c++17",
+          "intelliSenseMode": "clang-x64",
+          "compilerArgs": [
+              "-mcpu=cortex-m3",
+              "-lc",
+              "-lm",
+              "-lnosys"
+          ]
+      }
+  ],
+  "version": 4
 }

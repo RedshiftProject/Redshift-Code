@@ -21,7 +21,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "can.h"
-#include "fatfs.h"
+#include "ff.h"
+//#include "fatfs.h"
 #include "i2c.h"
 #include "spi.h"
 #include "usart.h"
@@ -39,13 +40,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define MPU_6050_ADD 0b1101000 << 1 //Since HAL needs 8-bit address
-#define MPU_6050_ACC_X_H 0x3B
-#define MPU_6050_ACC_X_L 0x3C
-#define MPU_6050_ACC_Z_H 0x3F
-#define MPU_6050_ACC_Z_L 0x40
-#define MPU_6050_ACC_CONF 0x1C
-#define MPU_6050_PWR_MGMT 0x6B
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -101,7 +96,7 @@ int main(void)
   MX_I2C1_Init();
   MX_USART1_UART_Init();
   MX_SPI1_Init();
-  MX_FATFS_Init();
+  //MX_FATFS_Init();
   MX_CAN_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
@@ -116,64 +111,22 @@ int main(void)
     GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_MEDIUM;
     GPIO_InitStructure.Pull = GPIO_PULLUP;
     HAL_GPIO_Init(GPIOC,&GPIO_InitStructure);
-
-    //Array for uart output
-    //uartString needs to be predefined as array otherwise (i.e. as pointer) chip crashes 
-    //uint8_t uartString[17];
-
-    //I2C Stuff
-
-    //MPU6050 Stuff
-    uint8_t acc_z[2]={0,0};    
-    //wakeup[0] Register address for power management of MPU6050
-    //wakeup[1] Register value to apply @address wakeup[0] (Sleep->0)
-    uint8_t wakeup[2];
-    wakeup[0]=MPU_6050_PWR_MGMT;
-    wakeup[1]=0x00;
-    //MPU6050 : Verify if ready
-    if(HAL_I2C_IsDeviceReady(&hi2c1,MPU_6050_ADD,2,HAL_MAX_DELAY) != HAL_OK)
-      //If not ready send message through UART
-      HAL_UART_Transmit(&huart1,(uint8_t *)"Not Okay Ready",14,HAL_MAX_DELAY);
-    //MPU6050 : Configure POWER_MGMT register to power it up
-    if(HAL_I2C_Master_Transmit(&hi2c1,MPU_6050_ADD,(uint8_t *)wakeup,2,HAL_MAX_DELAY) != HAL_OK)
-      //If not okay send message through UART
-      HAL_UART_Transmit(&huart1,(uint8_t *)"Not Okay Power",14,HAL_MAX_DELAY);
-
-    //MPU 6050 Acceleromter config (2g precision)
-    //config[0] Register address for accelerometer precision of MPU6050
-    //config[1] Register value to apply @address config[0] (2g precision)
-    uint8_t config[2];
-    config[0]=MPU_6050_ACC_CONF;
-    config[1]=0x00;
-    //Send config via i2c
-    if(HAL_I2C_Master_Transmit(&hi2c1,MPU_6050_ADD,(uint8_t *)config,2,HAL_MAX_DELAY) != HAL_OK)
-      //If config not okay send message through UART
-      HAL_UART_Transmit(&huart1,(uint8_t *)"Not Okay Conf",14,HAL_MAX_DELAY);
-    
+    HAL_Delay(100);
     //FatFs Stuff
-
-    char buffer[128];
     static FATFS g_sFatFs;
     FRESULT fresult;
     FIL file;
-    int len;
-    WORD bytes_written;
-        
+    UINT bytes_written;
+    
     //mount SD card 
     fresult = f_mount(&g_sFatFs, "0", 1);       
-    
+    HAL_Delay(50);
     //open file on SD card
-    fresult = f_open(&file, "file.txt", FA_OPEN_ALWAYS | FA_WRITE);
-    
-    //go to the end of the file
-    fresult = f_lseek(&file, file.fsize);   
-    
-    //generate some string
-    len = sprintf( buffer, "Hello World!\r\n");
-    
+    fresult = f_open(&file, "file.txt", FA_OPEN_APPEND | FA_WRITE);
+    HAL_Delay(50);
     //write data to the file
-    fresult = f_write(&file, "Hello World!\r\n", len, &bytes_written);
-    
+    fresult = f_write(&file, "Hello World!\r\n", 14, &bytes_written);
+    HAL_Delay(50);
     //close file
     fresult = f_close (&file);
   /* USER CODE END 2 */
@@ -186,37 +139,10 @@ int main(void)
     //GPIO stuff
     //Turn on PINC13 / Reset = ON because of pullup on board
     HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13,GPIO_PIN_RESET);
-    //UART Stuff
-    //HAL_UART_Transmit(&huart1,(unsigned char*)"Hello World ! Tx\n",17,100);
-    //HAL_UART_Receive(&huart1,uartString,17,2000);
-    //HAL_UART_Transmit(&huart1,uartString,17,100);
-
-    //I2C stuff
-    /** 
-     * Sky note : Master transmit then master receive doesn't work on mpu6050 because of 
-     * a stop bit at the end of transmit and/or a non existing register pointer on mpu6050 (maybe ?)
-     * Solution : Use HAL_I2C_Mem_Read() to read registers
-     */
-    //Start with register ACCEL_ZOUT[15:8] (accelerometer on Z axis)
-    //if(HAL_I2C_Master_Transmit(&hi2c1,MPU_6050_ADD,(uint8_t *)MPU_6050_ACC_Z_H,1,HAL_MAX_DELAY) != HAL_OK)
-    //  HAL_UART_Transmit(&huart1,(uint8_t *)"Not Okay TX",11,HAL_MAX_DELAY);
-    //else{
-      //Read Z acceleration (2 bytes) register from MPU6050 and put it in acc_z
-      if(HAL_I2C_Mem_Read(&hi2c1,MPU_6050_ADD,MPU_6050_ACC_Z_H,I2C_MEMADD_SIZE_8BIT,acc_z,2,HAL_MAX_DELAY))
-      //if(HAL_I2C_Master_Receive(&hi2c1,MPU_6050_ADD,(uint8_t *)acc_z,2,HAL_MAX_DELAY) != HAL_OK)
-        //If read fails, send message through UART
-        HAL_UART_Transmit(&huart1,(uint8_t *)"Not Okay RX",11,HAL_MAX_DELAY);
-      else{
-        //If it works send z acceleration value through UART
-        HAL_UART_Transmit(&huart1,(uint8_t *)"acc_z: ",7,HAL_MAX_DELAY);
-        HAL_UART_Transmit(&huart1,(uint8_t *)acc_z,2,HAL_MAX_DELAY);
-      }
-    //}
-    //Send a CR/LF to end line as a delimiter
-    HAL_UART_Transmit(&huart1,(uint8_t *)"\n",1,HAL_MAX_DELAY);
+    HAL_Delay(1000);
     //Turn off PINC13 / Set = OFF because of pullup on board
     HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13,GPIO_PIN_SET);
-    
+    HAL_Delay(1000);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

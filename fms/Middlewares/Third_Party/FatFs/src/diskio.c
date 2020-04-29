@@ -57,12 +57,12 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "diskio.h"
-#include "ff_gen_drv.h"
+//#include "ff_gen_drv.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-extern Disk_drvTypeDef  disk;
+//extern Disk_drvTypeDef  disk;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/

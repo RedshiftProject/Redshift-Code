@@ -19,8 +19,6 @@ TARGET = stm32cube_generation
 ######################################
 # building variables
 ######################################
-# debug build?
-DEBUG = 1
 # optimization
 OPT = -Og
 
@@ -39,8 +37,6 @@ C_SOURCES =  \
 Src/main.c \
 Src/gpio.c \
 Src/can.c \
-Src/user_diskio.c \
-Src/fatfs.c \
 Src/i2c.c \
 Src/spi.c \
 Src/usart.c \
@@ -66,8 +62,10 @@ Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c \
 Src/system_stm32f1xx.c \
 Middlewares/Third_Party/FatFs/src/diskio.c \
 Middlewares/Third_Party/FatFs/src/ff.c \
-Middlewares/Third_Party/FatFs/src/ff_gen_drv.c \
-Middlewares/Third_Party/FatFs/src/option/syscall.c  
+Middlewares/Third_Party/FatFs/src/option/syscall.c 
+#Middlewares/Third_Party/FatFs/src/ff_gen_drv.c \ 
+#Src/user_diskio.c \
+#Src/fatfs.c \
 
 # ASM sources
 ASM_SOURCES =  \
@@ -117,12 +115,6 @@ AS_DEFS =
 C_DEFS =  \
 -DUSE_HAL_DRIVER \
 -DSTM32F103xB
-
-# If it is a debug version, enable SWD pins
-ifeq (${DEBUG}, 1)
-  C_DEFS += -DDEBUG
-endif
-
 
 # AS includes
 AS_INCLUDES = 
