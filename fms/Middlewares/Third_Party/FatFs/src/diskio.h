@@ -13,7 +13,7 @@ extern "C" {
 #define _USE_IOCTL	1	/* 1: Enable disk_ioctl fucntion */
 
 #include "integer.h"
-
+#include "spi.h"
 
 /* Status of Disk Functions */
 typedef BYTE	DSTATUS;
@@ -37,7 +37,11 @@ DSTATUS disk_status (BYTE pdrv);
 DRESULT disk_read (BYTE pdrv, BYTE* buff, DWORD sector, UINT count);
 DRESULT disk_write (BYTE pdrv, const BYTE* buff, DWORD sector, UINT count);
 DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff);
+void sdcard_systick_timerproc(void);
+void disk_timerproc(void);
 DWORD get_fattime (void);
+
+
 
 /* Disk Status Bits (DSTATUS) */
 

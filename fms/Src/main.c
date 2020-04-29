@@ -20,9 +20,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
 #include "dma.h"
-#include "fatfs.h"
+#include "ff.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -123,7 +122,7 @@ int main(void)
   MX_I2C1_Init();
   MX_USART1_UART_Init();
   MX_SPI1_Init();
-  MX_FATFS_Init();
+  //MX_FATFS_Init();
   MX_CAN_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
@@ -171,10 +170,27 @@ int main(void)
     //if(HAL_I2C_Master_Transmit(&hi2c1,MPU_6050_ADD,(uint8_t *)config,2,HAL_MAX_DELAY) != HAL_OK)
       //If config not okay send message through UART
       //HAL_UART_Transmit(&huart1,(uint8_t *)"Not Okay Conf",14,HAL_MAX_DELAY);
+    HAL_Delay(100);
+    //FatFs Stuff
+    static FATFS g_sFatFs;
+    FRESULT fresult;
+    FIL file;
+    UINT bytes_written;
     
     //GPS STUFF
     HAL_UART_Receive_IT(&huart2,&uart_raw[0],1);
     
+    //mount SD card 
+    fresult = f_mount(&g_sFatFs, "0", 1);       
+    HAL_Delay(50);
+    //open file on SD card
+    fresult = f_open(&file, "file.txt", FA_OPEN_APPEND | FA_WRITE);
+    HAL_Delay(50);
+    //write data to the file
+    fresult = f_write(&file, "Hello World!\r\n", 14, &bytes_written);
+    HAL_Delay(50);
+    //close file
+    fresult = f_close (&file);
   /* USER CODE END 2 */
 
   /* Infinite loop */

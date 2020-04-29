@@ -13,5 +13,6 @@
         "ffconf.h": "c",
         "string.h": "c",
         "dma.h": "c"
+        "diskio.h": "c"
     }
 }
