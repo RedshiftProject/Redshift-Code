@@ -62,7 +62,7 @@ Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c \
 Src/system_stm32f1xx.c \
 Middlewares/Third_Party/FatFs/src/diskio.c \
 Middlewares/Third_Party/FatFs/src/ff.c \
-Src/dma.c
+Src/dma.c \
 Middlewares/Third_Party/FatFs/src/option/syscall.c 
 #Middlewares/Third_Party/FatFs/src/ff_gen_drv.c \ 
 #Src/user_diskio.c \

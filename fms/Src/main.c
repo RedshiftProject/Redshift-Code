@@ -178,8 +178,9 @@ int main(void)
     UINT bytes_written;
     
     //GPS STUFF
-    HAL_UART_Receive_IT(&huart2,&uart_raw[0],1);
-    
+    //HAL_UART_Receive_IT(&huart2,&uart_raw[0],1);
+    HAL_UART_Transmit_DMA(&huart1,"Hello World !\n",15);
+
     //mount SD card 
     fresult = f_mount(&g_sFatFs, "0", 1);       
     HAL_Delay(50);
@@ -201,7 +202,7 @@ int main(void)
     //GPIO stuff
     //Turn on PINC13 / Reset = ON because of pullup on board
     HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13,GPIO_PIN_RESET);
-    //HAL_Delay(500);
+    HAL_Delay(500);
     //UART Stuff
     //HAL_UART_Transmit(&huart1,(unsigned char*)"Hello World ! Tx\n",17,100);
     //HAL_UART_Receive(&huart1,uartString,17,2000);
@@ -248,7 +249,7 @@ int main(void)
     }
 
     HAL_GPIO_WritePin(GPIOC,GPIO_PIN_13,GPIO_PIN_SET);
-    //HAL_Delay(500);
+    HAL_Delay(500);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
