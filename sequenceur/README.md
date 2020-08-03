@@ -1,4 +1,4 @@
-# Sequenceur
+# Sequenceur Luc
 Minuteur pour l'ouverture du parachute
 Reçois un signal de la carte capteur pour l'ouverture à un temps optimal du parachute
 
